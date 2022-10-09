@@ -20,30 +20,39 @@ namespace ProcessMonitorUtility
             timer.Start();
 
             DateTime End = DateTime.Now.AddSeconds(10);
-            while(true)
+           while(true)
                 if (monitoring)
                 {
                     Console.WriteLine($"Monitoring for {processOfInterest}....");
                     Process[] ps = Process.GetProcessesByName(processOfInterest);
+                 
+                    /* if instance of the given process is running, decides what to do*/
                     if (ps.Count() == 0)
                     {
                         Console.WriteLine($"No instance of {processOfInterest} is running. Continue Monitoring(yes/no)");
                         timer.Enabled=false;
                         string? confirm = Console.ReadLine();
-                        if (confirm!=null && confirm.Equals("yes"))
+                       
+                        /* continue monitoring*/
+                        if (confirm!=null && confirm.Equals("yes")) 
                         {
                             timer.Enabled = true;
                             continue;
+                       
                           
                         }
+                        /* break from loop and stop the monitoring*/
                         else
                         {
                             monitoring = false;
                             stopMonitor = true;
-                            goto End;
+                            break;
 
                         }
                     }
+
+                    /* For each process identified, check if the process has been running for more than maximum given time.
+                     * If so, kill them.*/
                     foreach (Process p in ps)
                     {
                         DateTime processStartTime = p.StartTime;
@@ -58,7 +67,7 @@ namespace ProcessMonitorUtility
                     monitoring = false;
                 }
 
-            End: StopMonitoring();
+            StopMonitoring();
 
         }
 
